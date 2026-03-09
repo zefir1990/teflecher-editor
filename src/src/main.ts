@@ -24,7 +24,7 @@ function generateId(): string {
     return crypto.randomUUID();
   }
   // Fallback for non-secure contexts
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
@@ -38,7 +38,6 @@ let currentQuiz: Quiz = {
 };
 
 // DOM Elements
-const quizIdInput = document.getElementById('quiz-id') as HTMLInputElement;
 const quizTitleInput = document.getElementById('quiz-title') as HTMLInputElement;
 const questionsList = document.getElementById('questions-list') as HTMLDivElement;
 const addQuestionBtn = document.getElementById('add-question') as HTMLButtonElement;
@@ -55,10 +54,6 @@ function init() {
 }
 
 function bindGlobalEvents() {
-  quizIdInput.addEventListener('input', (e) => {
-    currentQuiz.id = (e.target as HTMLInputElement).value;
-  });
-
   quizTitleInput.addEventListener('input', (e) => {
     currentQuiz.title = (e.target as HTMLInputElement).value;
   });
@@ -77,7 +72,7 @@ function bindGlobalEvents() {
     };
     currentQuiz.questions.push(newQuestion);
     renderQuiz();
-    
+
     // Scroll to new question smoothly
     setTimeout(() => {
       window.scrollTo({
@@ -102,11 +97,10 @@ function bindGlobalEvents() {
 }
 
 function renderQuiz() {
-  quizIdInput.value = currentQuiz.id;
   quizTitleInput.value = currentQuiz.title;
-  
+
   questionsList.innerHTML = '';
-  
+
   currentQuiz.questions.forEach((question, index) => {
     const questionEl = renderQuestion(question, index);
     questionsList.appendChild(questionEl);
@@ -116,18 +110,18 @@ function renderQuiz() {
 function renderQuestion(question: Question, index: number): HTMLElement {
   const clone = questionTemplate.content.cloneNode(true) as DocumentFragment;
   const card = clone.querySelector('.question-card') as HTMLDivElement;
-  
+
   card.dataset.questionId = question.id;
-  
+
   const numberEl = card.querySelector('.question-number') as HTMLSpanElement;
   numberEl.textContent = `Question ${index + 1}`;
-  
+
   const textInput = card.querySelector('.question-text') as HTMLInputElement;
   textInput.value = question.text;
   textInput.addEventListener('input', (e) => {
     question.text = (e.target as HTMLInputElement).value;
   });
-  
+
   const removeBtn = card.querySelector('.remove-question') as HTMLButtonElement;
   removeBtn.addEventListener('click', () => {
     // Add fly-out animation before removing
@@ -139,13 +133,13 @@ function renderQuestion(question: Question, index: number): HTMLElement {
       renderQuiz();
     }, 200);
   });
-  
+
   const answersList = card.querySelector('.answers-list') as HTMLDivElement;
   question.answers.forEach((answer) => {
-    const answerEl = renderAnswer(answer, question, answersList);
+    const answerEl = renderAnswer(answer, question);
     answersList.appendChild(answerEl);
   });
-  
+
   const addAnswerBtn = card.querySelector('.add-answer') as HTMLButtonElement;
   addAnswerBtn.addEventListener('click', () => {
     const newAnswer: Answer = {
@@ -155,31 +149,31 @@ function renderQuestion(question: Question, index: number): HTMLElement {
     };
     question.answers.push(newAnswer);
     renderQuiz();
-    
+
     // Auto-focus the last added answer text field
     setTimeout(() => {
       const inputs = card.querySelectorAll('.answer-text') as NodeListOf<HTMLInputElement>;
-      if(inputs.length > 0) inputs[inputs.length - 1].focus();
+      if (inputs.length > 0) inputs[inputs.length - 1].focus();
     }, 50);
   });
-  
+
   return card;
 }
 
-function renderAnswer(answer: Answer, question: Question, answersList: HTMLDivElement): HTMLElement {
+function renderAnswer(answer: Answer, question: Question): HTMLElement {
   const clone = answerTemplate.content.cloneNode(true) as DocumentFragment;
   const item = clone.querySelector('.answer-item') as HTMLDivElement;
-  
+
   item.dataset.answerId = answer.id;
-  
+
   if (answer.isCorrect) {
     item.classList.add('is-correct');
   }
-  
+
   const radio = item.querySelector('.answer-correct-radio') as HTMLInputElement;
   radio.name = `correct-answer-${question.id}`; // unique per question
   radio.checked = answer.isCorrect;
-  
+
   radio.addEventListener('change', () => {
     // Ensure this is the only correct answer for this question
     question.answers.forEach(a => {
@@ -187,13 +181,13 @@ function renderAnswer(answer: Answer, question: Question, answersList: HTMLDivEl
     });
     renderQuiz();
   });
-  
+
   const textInput = item.querySelector('.answer-text') as HTMLInputElement;
   textInput.value = answer.text;
   textInput.addEventListener('input', (e) => {
     answer.text = (e.target as HTMLInputElement).value;
   });
-  
+
   const removeBtn = item.querySelector('.remove-answer') as HTMLButtonElement;
   removeBtn.addEventListener('click', () => {
     item.style.opacity = '0';
@@ -208,62 +202,71 @@ function renderAnswer(answer: Answer, question: Question, answersList: HTMLDivEl
       renderQuiz();
     }, 200);
   });
-  
+
   return item;
 }
 
 function exportJson() {
+  // Enforce UUIDs on save
+  if (!currentQuiz.id) currentQuiz.id = generateId();
+  currentQuiz.questions.forEach(q => {
+    if (!q.id) q.id = generateId();
+    q.answers.forEach(a => {
+      if (!a.id) a.id = generateId();
+    });
+  });
+
   const dataStr = JSON.stringify(currentQuiz, null, 2);
   const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-  
+
   const link = document.createElement('a');
   link.href = url;
   const filename = (currentQuiz.id || 'quiz').trim().replace(/\s+/g, '-').toLowerCase();
   link.download = `${filename}.json`;
-  
+
   document.body.appendChild(link);
   link.click();
-  
+
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
 
 function loadJson(file: File) {
   const reader = new FileReader();
-  
+
   reader.onload = (e) => {
     try {
       const content = e.target?.result as string;
       const parsed = JSON.parse(content) as Quiz;
-      
+
       // Basic validation
       if (!parsed.id || !parsed.questions || !Array.isArray(parsed.questions)) {
         throw new Error('Invalid quiz format');
       }
-      
+
       currentQuiz = parsed;
       renderQuiz();
-      
+
       // Success feedback on load button
       const label = document.querySelector('label[for="load-json"]') as HTMLLabelElement;
       const originalText = label.innerHTML;
       label.innerHTML = '<span class="material-icons-round">check</span> Loaded!';
       label.classList.add('btn-success');
       label.classList.remove('btn-secondary');
-      
+
       setTimeout(() => {
         label.innerHTML = originalText;
         label.classList.remove('btn-success');
         label.classList.add('btn-secondary');
       }, 2000);
-      
+
     } catch (err) {
       console.error('Failed to parse JSON', err);
       alert('Failed to load JSON file. Please make sure it follows the correct format.');
     }
   };
-  
+
   reader.readAsText(file);
 }
 

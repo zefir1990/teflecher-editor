@@ -1,104 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Quiz Editor</title>
-    <meta name="description" content="A beautiful Quiz Editor app" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <link rel="stylesheet" href="/src/style.css" />
-  </head>
-  <body>
-    <div id="app">
-      <header class="app-header glass-panel">
-        <div class="header-content">
-          <h1>Quiz Editor</h1>
-          <div class="header-actions">
-            <label class="btn btn-secondary" for="load-json">
-              <span class="material-icons-round">upload_file</span> Load JSON
-              <input type="file" id="load-json" accept=".json" style="display: none;" />
-            </label>
-            <button id="export-json" class="btn btn-primary">
-              <span class="material-icons-round">download</span> Export JSON
-            </button>
-          </div>
-        </div>
-      </header>
 
-      <main class="quiz-container glass-panel">
-        <div class="quiz-meta form-group-row">
-          <div class="form-group flex-1">
-            <label for="quiz-id">Quiz ID</label>
-            <input type="text" id="quiz-id" class="input-field" placeholder="e.g. my-awesome-quiz" />
-          </div>
-          <div class="form-group flex-2">
-            <label for="quiz-title">Quiz Title</label>
-            <input type="text" id="quiz-title" class="input-field" placeholder="e.g. My Awesome Quiz" />
-          </div>
-        </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Quiz Editor</title>
+  <meta name="description" content="A beautiful Quiz Editor app" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
 
-        <div class="questions-section">
-          <div class="section-header">
-            <h2>Questions</h2>
-            <button id="add-question" class="btn btn-icon btn-success tooltip" data-tooltip="Add Question">
-              <span class="material-icons-round">add</span>
-            </button>
-          </div>
-          <div id="questions-list">
-            <!-- Questions will be rendered here -->
-          </div>
+<body>
+  <div id="app">
+    <header class="app-header glass-panel">
+      <div class="header-content">
+        <h1>Quiz Editor</h1>
+        <div class="header-actions">
+          <label class="btn btn-secondary" for="load-json">
+            <span class="material-icons-round">upload_file</span> Load JSON
+            <input type="file" id="load-json" accept=".json" style="display: none;" />
+          </label>
+          <button id="export-json" class="btn btn-primary">
+            <span class="material-icons-round">download</span> Export JSON
+          </button>
         </div>
-      </main>
+      </div>
+    </header>
+
+    <main class="quiz-container glass-panel">
+      <div class="quiz-meta form-group-row">
+        <!-- Quiz ID hidden in UI -->
+        <div class="form-group flex-2">
+          <label for="quiz-title">Quiz Title</label>
+          <input type="text" id="quiz-title" class="input-field" placeholder="e.g. My Awesome Quiz" />
+        </div>
+      </div>
+
+      <div class="questions-section">
+        <div class="section-header">
+          <h2>Questions</h2>
+          <button id="add-question" class="btn btn-icon btn-success tooltip" data-tooltip="Add Question">
+            <span class="material-icons-round">add</span>
+          </button>
+        </div>
+        <div id="questions-list">
+          <!-- Questions will be rendered here -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Template for a single question -->
+  <template id="question-template">
+    <div class="question-card glass-panel-inner" data-question-id="">
+      <div class="question-header">
+        <span class="question-number"></span>
+        <div class="question-actions">
+          <button class="btn btn-icon btn-danger remove-question tooltip" data-tooltip="Remove Question">
+            <span class="material-icons-round">delete_outline</span>
+          </button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="sr-only">Question Text</label>
+        <input type="text" class="input-field question-text" placeholder="Enter question text here..." />
+      </div>
+      <div class="answers-section">
+        <div class="section-header-small">
+          <h3>Answers</h3>
+          <button class="btn btn-icon-small btn-success add-answer tooltip" data-tooltip="Add Answer">
+            <span class="material-icons-round">add</span>
+          </button>
+        </div>
+        <div class="answers-list">
+          <!-- Answers will be rendered here -->
+        </div>
+      </div>
     </div>
+  </template>
 
-    <!-- Template for a single question -->
-    <template id="question-template">
-      <div class="question-card glass-panel-inner" data-question-id="">
-        <div class="question-header">
-          <span class="question-number"></span>
-          <div class="question-actions">
-             <button class="btn btn-icon btn-danger remove-question tooltip" data-tooltip="Remove Question">
-               <span class="material-icons-round">delete_outline</span>
-             </button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="sr-only">Question Text</label>
-          <input type="text" class="input-field question-text" placeholder="Enter question text here..." />
-        </div>
-        <div class="answers-section">
-          <div class="section-header-small">
-            <h3>Answers</h3>
-            <button class="btn btn-icon-small btn-success add-answer tooltip" data-tooltip="Add Answer">
-              <span class="material-icons-round">add</span>
-            </button>
-          </div>
-          <div class="answers-list">
-            <!-- Answers will be rendered here -->
-          </div>
-        </div>
+  <!-- Template for a single answer -->
+  <template id="answer-template">
+    <div class="answer-item" data-answer-id="">
+      <label class="custom-radio">
+        <input type="radio" class="answer-correct-radio" name="" />
+        <span class="radio-mark"></span>
+      </label>
+      <div class="answer-inputs">
+        <input type="text" class="input-field answer-text" placeholder="Answer text..." />
       </div>
-    </template>
+      <button class="btn btn-icon-small btn-danger remove-answer" title="Remove Answer">
+        <span class="material-icons-round">close</span>
+      </button>
+    </div>
+  </template>
 
-    <!-- Template for a single answer -->
-    <template id="answer-template">
-      <div class="answer-item" data-answer-id="">
-        <label class="custom-radio">
-          <input type="radio" class="answer-correct-radio" name="" />
-          <span class="radio-mark"></span>
-        </label>
-        <div class="answer-inputs">
-           <input type="text" class="input-field answer-text" placeholder="Answer text..." />
-        </div>
-        <button class="btn btn-icon-small btn-danger remove-answer" title="Remove Answer">
-          <span class="material-icons-round">close</span>
-        </button>
-      </div>
-    </template>
+  <script type="module" src="/src/main.ts"></script>
+</body>
 
-    <script type="module" src="/src/main.ts"></script>
-  </body>
 </html>
