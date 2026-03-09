@@ -181,6 +181,18 @@ h3 {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+.lang-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+  margin-top: 16px;
+}
+
+.lang-options .btn {
+  justify-content: center;
+}
+
 .btn-icon,
 .btn-icon-small {
   padding: 0;

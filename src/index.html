@@ -19,12 +19,16 @@
       <div class="header-content">
         <h1>Quiz Editor</h1>
         <div class="header-actions">
+          <button id="open-lang-modal" class="btn btn-secondary tooltip" data-i18n="langSelectTooltip"
+            data-tooltip="Select Language">
+            <span class="material-icons-round">language</span> <span id="current-lang-display">EN</span>
+          </button>
           <label class="btn btn-secondary" for="load-json">
-            <span class="material-icons-round">upload_file</span> Load JSON
+            <span class="material-icons-round">upload_file</span> <span data-i18n="loadJson">Load JSON</span>
             <input type="file" id="load-json" accept=".json" style="display: none;" />
           </label>
           <button id="export-json" class="btn btn-primary">
-            <span class="material-icons-round">download</span> Export JSON
+            <span class="material-icons-round">download</span> <span data-i18n="exportJson">Export JSON</span>
           </button>
         </div>
       </div>
@@ -34,15 +38,17 @@
       <div class="quiz-meta form-group-row">
         <!-- Quiz ID hidden in UI -->
         <div class="form-group flex-2">
-          <label for="quiz-title">Quiz Title</label>
-          <input type="text" id="quiz-title" class="input-field" placeholder="e.g. My Awesome Quiz" />
+          <label for="quiz-title" data-i18n="quizTitleLabel">Quiz Title</label>
+          <input type="text" id="quiz-title" class="input-field" data-i18n="quizTitlePlaceholder"
+            placeholder="e.g. My Awesome Quiz" />
         </div>
       </div>
 
       <div class="questions-section">
         <div class="section-header">
-          <h2>Questions</h2>
-          <button id="add-question" class="btn btn-icon btn-success tooltip" data-tooltip="Add Question">
+          <h2 data-i18n="questionsHeader">Questions</h2>
+          <button id="add-question" class="btn btn-icon btn-success tooltip" data-i18n="addQuestionTooltip"
+            data-tooltip="Add Question">
             <span class="material-icons-round">add</span>
           </button>
         </div>
@@ -59,25 +65,30 @@
       <div class="question-header">
         <span class="question-number"></span>
         <div class="question-actions">
-          <button class="btn btn-icon btn-secondary move-up-question tooltip" data-tooltip="Move Up">
+          <button class="btn btn-icon btn-secondary move-up-question tooltip" data-i18n="moveUpTooltip"
+            data-tooltip="Move Up">
             <span class="material-icons-round">keyboard_arrow_up</span>
           </button>
-          <button class="btn btn-icon btn-secondary move-down-question tooltip" data-tooltip="Move Down">
+          <button class="btn btn-icon btn-secondary move-down-question tooltip" data-i18n="moveDownTooltip"
+            data-tooltip="Move Down">
             <span class="material-icons-round">keyboard_arrow_down</span>
           </button>
-          <button class="btn btn-icon btn-danger remove-question tooltip" data-tooltip="Remove Question">
+          <button class="btn btn-icon btn-danger remove-question tooltip" data-i18n="removeQuestionTooltip"
+            data-tooltip="Remove Question">
             <span class="material-icons-round">delete_outline</span>
           </button>
         </div>
       </div>
       <div class="form-group">
         <label class="sr-only">Question Text</label>
-        <input type="text" class="input-field question-text" placeholder="Enter question text here..." />
+        <input type="text" class="input-field question-text" data-i18n="questionTextPlaceholder"
+          placeholder="Enter question text here..." />
       </div>
       <div class="answers-section">
         <div class="section-header-small">
-          <h3>Answers</h3>
-          <button class="btn btn-icon-small btn-success add-answer tooltip" data-tooltip="Add Answer">
+          <h3 data-i18n="answersHeader">Answers</h3>
+          <button class="btn btn-icon-small btn-success add-answer tooltip" data-i18n="addAnswerTooltip"
+            data-tooltip="Add Answer">
             <span class="material-icons-round">add</span>
           </button>
         </div>
@@ -96,9 +107,11 @@
         <span class="radio-mark"></span>
       </label>
       <div class="answer-inputs">
-        <input type="text" class="input-field answer-text" placeholder="Answer text..." />
+        <input type="text" class="input-field answer-text" data-i18n="answerTextPlaceholder"
+          placeholder="Answer text..." />
       </div>
-      <button class="btn btn-icon-small btn-danger remove-answer" title="Remove Answer">
+      <button class="btn btn-icon-small btn-danger remove-answer tooltip" data-i18n="removeAnswerTooltip"
+        data-tooltip="Remove Answer">
         <span class="material-icons-round">close</span>
       </button>
     </div>
@@ -107,11 +120,25 @@
   <!-- Custom Confirm Modal -->
   <div id="confirm-modal" class="modal-overlay hidden">
     <div class="modal-card glass-panel">
-      <h3 id="confirm-title">Confirm Action</h3>
-      <p id="confirm-message">Are you sure you want to proceed?</p>
+      <h3 id="confirm-title" data-i18n="confirmTitle">Confirm Action</h3>
+      <p id="confirm-message" data-i18n="confirmMessageDefault">Are you sure you want to proceed?</p>
       <div class="modal-actions">
-        <button id="confirm-cancel-btn" class="btn btn-secondary">Cancel</button>
-        <button id="confirm-ok-btn" class="btn btn-danger">Delete</button>
+        <button id="confirm-cancel-btn" class="btn btn-secondary" data-i18n="confirmCancel">Cancel</button>
+        <button id="confirm-ok-btn" class="btn btn-danger" data-i18n="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Language Select Modal -->
+  <div id="lang-modal" class="modal-overlay hidden">
+    <div class="modal-card glass-panel">
+      <h3 data-i18n="langModalTitle">Select Language / Выберите язык</h3>
+      <div class="lang-options">
+        <button class="btn btn-secondary lang-option-btn" data-lang="en">English (EN)</button>
+        <button class="btn btn-secondary lang-option-btn" data-lang="ru">Русский (RU)</button>
+      </div>
+      <div class="modal-actions" style="margin-top: 24px;">
+        <button id="lang-cancel-btn" class="btn btn-secondary" data-i18n="confirmCancel">Cancel</button>
       </div>
     </div>
   </div>

@@ -1,4 +1,5 @@
 import './style.css';
+import { initI18n, setLang, getLang, t, applyTranslations } from './i18n';
 
 interface Answer {
   id: string;
@@ -44,6 +45,12 @@ const addQuestionBtn = document.getElementById('add-question') as HTMLButtonElem
 const exportBtn = document.getElementById('export-json') as HTMLButtonElement;
 const loadInput = document.getElementById('load-json') as HTMLInputElement;
 
+const openLangModalBtn = document.getElementById('open-lang-modal') as HTMLButtonElement;
+const currentLangDisplay = document.getElementById('current-lang-display') as HTMLSpanElement;
+const langModal = document.getElementById('lang-modal') as HTMLDivElement;
+const langCancelBtn = document.getElementById('lang-cancel-btn') as HTMLButtonElement;
+const langOptionBtns = document.querySelectorAll('.lang-option-btn');
+
 const questionTemplate = document.getElementById('question-template') as HTMLTemplateElement;
 const answerTemplate = document.getElementById('answer-template') as HTMLTemplateElement;
 
@@ -55,11 +62,11 @@ const confirmCancelBtn = document.getElementById('confirm-cancel-btn') as HTMLBu
 const confirmOkBtn = document.getElementById('confirm-ok-btn') as HTMLButtonElement;
 
 // Custom Confirm Logic
-function showConfirm(title: string, message: string, okText: string = 'Delete'): Promise<boolean> {
+function showConfirm(titleKey: string, messageKey: string, okTextKey: string = 'confirmDelete'): Promise<boolean> {
   return new Promise((resolve) => {
-    confirmTitle.textContent = title;
-    confirmMessage.textContent = message;
-    confirmOkBtn.textContent = okText;
+    confirmTitle.textContent = t(titleKey);
+    confirmMessage.textContent = t(messageKey);
+    confirmOkBtn.textContent = t(okTextKey);
 
     confirmModal.classList.remove('hidden');
 
@@ -86,13 +93,41 @@ function showConfirm(title: string, message: string, okText: string = 'Delete'):
 
 // Initialization
 function init() {
+  initI18n();
+  updateLangDisplay();
   bindGlobalEvents();
   renderQuiz();
+}
+
+function updateLangDisplay() {
+  currentLangDisplay.textContent = getLang().toUpperCase();
 }
 
 function bindGlobalEvents() {
   quizTitleInput.addEventListener('input', (e) => {
     currentQuiz.title = (e.target as HTMLInputElement).value;
+  });
+
+  // Language Modal Logic
+  openLangModalBtn.addEventListener('click', () => {
+    langModal.classList.remove('hidden');
+  });
+
+  langCancelBtn.addEventListener('click', () => {
+    langModal.classList.add('hidden');
+  });
+
+  langOptionBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLButtonElement;
+      const newLang = target.getAttribute('data-lang') as 'en' | 'ru';
+      if (newLang) {
+        setLang(newLang);
+        updateLangDisplay();
+        renderQuiz();
+      }
+      langModal.classList.add('hidden');
+    });
   });
 
   addQuestionBtn.addEventListener('click', () => {
@@ -142,6 +177,9 @@ function renderQuiz() {
     const questionEl = renderQuestion(question, index);
     questionsList.appendChild(questionEl);
   });
+
+  // Re-apply translations for entire DOM just in case
+  applyTranslations();
 }
 
 function renderQuestion(question: Question, index: number): HTMLElement {
@@ -151,7 +189,7 @@ function renderQuestion(question: Question, index: number): HTMLElement {
   card.dataset.questionId = question.id;
 
   const numberEl = card.querySelector('.question-number') as HTMLSpanElement;
-  numberEl.textContent = `Question ${index + 1}`;
+  numberEl.textContent = `${t('questionPrefix')} ${index + 1}`;
 
   const textInput = card.querySelector('.question-text') as HTMLInputElement;
   textInput.value = question.text;
@@ -197,8 +235,8 @@ function renderQuestion(question: Question, index: number): HTMLElement {
   const removeBtn = card.querySelector('.remove-question') as HTMLButtonElement;
   removeBtn.addEventListener('click', async () => {
     const isConfirmed = await showConfirm(
-      'Delete Question',
-      'Are you sure you want to delete this question? This action cannot be undone.'
+      'confirmTitle',
+      'confirmMessageQuestion'
     );
 
     if (!isConfirmed) {
@@ -272,8 +310,8 @@ function renderAnswer(answer: Answer, question: Question): HTMLElement {
   const removeBtn = item.querySelector('.remove-answer') as HTMLButtonElement;
   removeBtn.addEventListener('click', async () => {
     const isConfirmed = await showConfirm(
-      'Delete Answer',
-      'Are you sure you want to delete this answer?'
+      'confirmTitle',
+      'confirmMessageAnswer'
     );
 
     if (!isConfirmed) {
@@ -345,7 +383,7 @@ function loadJson(file: File) {
       // Success feedback on load button
       const label = document.querySelector('label[for="load-json"]') as HTMLLabelElement;
       const originalText = label.innerHTML;
-      label.innerHTML = '<span class="material-icons-round">check</span> Loaded!';
+      label.innerHTML = `<span class="material-icons-round">check</span> ${t('loadedFeedback')}`;
       label.classList.add('btn-success');
       label.classList.remove('btn-secondary');
 
@@ -357,7 +395,7 @@ function loadJson(file: File) {
 
     } catch (err) {
       console.error('Failed to parse JSON', err);
-      alert('Failed to load JSON file. Please make sure it follows the correct format.');
+      alert(t('errorFormat'));
     }
   };
 
