@@ -262,12 +262,14 @@ function renderAnswer(answer: Answer, question: Question): HTMLElement {
 }
 
 function exportJson() {
-  // Enforce UUIDs on save
-  if (!currentQuiz.id) currentQuiz.id = generateId();
+  const originalId = currentQuiz.id;
+
+  // Always recreate all IDs from scratch on save
+  currentQuiz.id = generateId();
   currentQuiz.questions.forEach(q => {
-    if (!q.id) q.id = generateId();
+    q.id = generateId();
     q.answers.forEach(a => {
-      if (!a.id) a.id = generateId();
+      a.id = generateId();
     });
   });
 
@@ -277,7 +279,9 @@ function exportJson() {
 
   const link = document.createElement('a');
   link.href = url;
-  const filename = (currentQuiz.id || 'quiz').trim().replace(/\s+/g, '-').toLowerCase();
+
+  // Use the original ID for the filename if available, otherwise fallback
+  const filename = (originalId || 'quiz').trim().replace(/\s+/g, '-').toLowerCase();
   link.download = `${filename}.json`;
 
   document.body.appendChild(link);
