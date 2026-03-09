@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.example.helloworld',
-  appName: 'Hello World',
+  appId: 'com.demensdeum.teflecher.editor',
+  appName: 'Teflecher Editor',
   webDir: 'dist'
 };
 
