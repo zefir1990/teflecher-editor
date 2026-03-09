@@ -159,6 +159,41 @@ function renderQuestion(question: Question, index: number): HTMLElement {
     question.text = (e.target as HTMLInputElement).value;
   });
 
+  const moveUpBtn = card.querySelector('.move-up-question') as HTMLButtonElement;
+  const moveDownBtn = card.querySelector('.move-down-question') as HTMLButtonElement;
+
+  if (index === 0) {
+    moveUpBtn.disabled = true;
+    moveUpBtn.style.opacity = '0.3';
+    moveUpBtn.style.cursor = 'not-allowed';
+  } else {
+    moveUpBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      // Swap with previous
+      const temp = currentQuiz.questions[index - 1];
+      currentQuiz.questions[index - 1] = currentQuiz.questions[index];
+      currentQuiz.questions[index] = temp;
+      renderQuiz();
+    });
+  }
+
+  if (index === currentQuiz.questions.length - 1) {
+    moveDownBtn.disabled = true;
+    moveDownBtn.style.opacity = '0.3';
+    moveDownBtn.style.cursor = 'not-allowed';
+  } else {
+    moveDownBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      // Swap with next
+      const temp = currentQuiz.questions[index + 1];
+      currentQuiz.questions[index + 1] = currentQuiz.questions[index];
+      currentQuiz.questions[index] = temp;
+      renderQuiz();
+    });
+  }
+
   const removeBtn = card.querySelector('.remove-question') as HTMLButtonElement;
   removeBtn.addEventListener('click', async () => {
     const isConfirmed = await showConfirm(
