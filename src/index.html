@@ -98,6 +98,18 @@
     </div>
   </template>
 
+  <!-- Custom Confirm Modal -->
+  <div id="confirm-modal" class="modal-overlay hidden">
+    <div class="modal-card glass-panel">
+      <h3 id="confirm-title">Confirm Action</h3>
+      <p id="confirm-message">Are you sure you want to proceed?</p>
+      <div class="modal-actions">
+        <button id="confirm-cancel-btn" class="btn btn-secondary">Cancel</button>
+        <button id="confirm-ok-btn" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="/src/main.ts"></script>
 </body>
 

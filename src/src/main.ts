@@ -47,6 +47,43 @@ const loadInput = document.getElementById('load-json') as HTMLInputElement;
 const questionTemplate = document.getElementById('question-template') as HTMLTemplateElement;
 const answerTemplate = document.getElementById('answer-template') as HTMLTemplateElement;
 
+// Modal Elements
+const confirmModal = document.getElementById('confirm-modal') as HTMLDivElement;
+const confirmTitle = document.getElementById('confirm-title') as HTMLHeadingElement;
+const confirmMessage = document.getElementById('confirm-message') as HTMLParagraphElement;
+const confirmCancelBtn = document.getElementById('confirm-cancel-btn') as HTMLButtonElement;
+const confirmOkBtn = document.getElementById('confirm-ok-btn') as HTMLButtonElement;
+
+// Custom Confirm Logic
+function showConfirm(title: string, message: string, okText: string = 'Delete'): Promise<boolean> {
+  return new Promise((resolve) => {
+    confirmTitle.textContent = title;
+    confirmMessage.textContent = message;
+    confirmOkBtn.textContent = okText;
+
+    confirmModal.classList.remove('hidden');
+
+    const handleOk = () => {
+      cleanup();
+      resolve(true);
+    };
+
+    const handleCancel = () => {
+      cleanup();
+      resolve(false);
+    };
+
+    const cleanup = () => {
+      confirmOkBtn.removeEventListener('click', handleOk);
+      confirmCancelBtn.removeEventListener('click', handleCancel);
+      confirmModal.classList.add('hidden');
+    };
+
+    confirmOkBtn.addEventListener('click', handleOk);
+    confirmCancelBtn.addEventListener('click', handleCancel);
+  });
+}
+
 // Initialization
 function init() {
   bindGlobalEvents();
@@ -123,7 +160,16 @@ function renderQuestion(question: Question, index: number): HTMLElement {
   });
 
   const removeBtn = card.querySelector('.remove-question') as HTMLButtonElement;
-  removeBtn.addEventListener('click', () => {
+  removeBtn.addEventListener('click', async () => {
+    const isConfirmed = await showConfirm(
+      'Delete Question',
+      'Are you sure you want to delete this question? This action cannot be undone.'
+    );
+
+    if (!isConfirmed) {
+      return;
+    }
+
     // Add fly-out animation before removing
     card.style.opacity = '0';
     card.style.transform = 'translateY(-10px)';
@@ -189,7 +235,16 @@ function renderAnswer(answer: Answer, question: Question): HTMLElement {
   });
 
   const removeBtn = item.querySelector('.remove-answer') as HTMLButtonElement;
-  removeBtn.addEventListener('click', () => {
+  removeBtn.addEventListener('click', async () => {
+    const isConfirmed = await showConfirm(
+      'Delete Answer',
+      'Are you sure you want to delete this answer?'
+    );
+
+    if (!isConfirmed) {
+      return;
+    }
+
     item.style.opacity = '0';
     item.style.transform = 'translateX(-10px)';
     item.style.transition = 'all 0.2s';
